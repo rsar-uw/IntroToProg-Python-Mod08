@@ -52,10 +52,10 @@ class Product:
 
     @product_price.setter
     def product_price(self, value):  # setter
-        if not str(value).isnumeric() or float(value) < 0:
-            raise Exception("Price must be a number and cannot be negative.")
-        else:
+        if float(value) and value >= 0:
             self.__product_price = value
+        elif not str(value).isnumeric() or float(value) < 0:
+            raise Exception("Price must be a number and cannot be negative.")
 
     # -- Methods --
     # TODO: Add Code to the Product class
@@ -116,9 +116,6 @@ class FileProcessor:
                            str(item.product_price) + "\n")
         file.close()
         print("\tData saved to file: '" + file_name + "'")
-        input("\nPress ENTER key to quit the program.")
-        return list_of_rows
-
 # Processing  ------------------------------------------------------------- #
 
 # Presentation (Input/Output)  -------------------------------------------- #
@@ -162,7 +159,7 @@ class IO:
     def show_current_data(list_of_products):
         print("\t-------- List of Products --------")
         for item in list_of_products:
-            print("\t" + str(item.product_name) + "\t $" +
+            print("\t" + str(item.product_name) + "\t\t $" +
                   '{0:.2f}'.format(item.product_price))
         print("\t" + "-"*35)
 
@@ -182,10 +179,13 @@ class IO:
         while True:
             price = input("\nEnter product PRICE: \t")
             try:
-                item.product_price = price
+                item.product_price = float(price)
                 break
             except Exception as e:
                 print("\n\t" + errorCode + str(e))
+        print()
+        print("\tNew product added: \t" + str(item.product_name) + "\t $" +
+              '{0:.2f}'.format(item.product_price))
         return item
 
 # Presentation (Input/Output)  -------------------------------------------- #
@@ -200,8 +200,8 @@ except FileNotFoundError as e:
 except Exception as e:
     print(e)
 else:
-    lstOfProductObjects = FileProcessor.read_data_from_file(strFileName,
-                                                            lstOfProductObjects)
+    lstOfProductObjects = FileProcessor.\
+        read_data_from_file(strFileName, lstOfProductObjects)
     while True:
         # Show user a menu of options
         IO.output_menu_tasks()
@@ -228,10 +228,21 @@ else:
             # let user save current data to file and exit program
         elif choice_str.strip() == '3':
             # ask user to save and exit
-            print()
-            print("\tSaving data to file...")
-            print()
-            lstOfProductObjects = \
-                FileProcessor.save_data_to_file(strFileName,
-                                                lstOfProductObjects)
+            while True:
+                choice = input("\nSave changes to file? [Y/N]: \t")
+                if choice.lower() == "y":
+                    print()
+                    print("\tSaving data to file...")
+                    print()
+                    FileProcessor.save_data_to_file(strFileName,
+                                                    lstOfProductObjects)
+                    break
+                elif choice.lower() == "n":
+                    print()
+                    print("\tData not saved to file...")
+                    break
+                else:
+                    print("\n\t" + errorCode + ": Invalid choice.")
+                #     continue
+            input("\nPress ENTER key to quit the program.")
             break
