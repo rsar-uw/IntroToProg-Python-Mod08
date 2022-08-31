@@ -10,8 +10,9 @@
 
 
 # Data -------------------------------------------------------------------- #
-strFileName = 'products.txt'
+strFileName = "products.txt"
 lstOfProductObjects = []
+errorCode = "Error. Error. My robot balls: "
 
 class Product:
     """Stores data about a product:
@@ -28,8 +29,8 @@ class Product:
     # -- Constructor --
     def __init__(self, product_name, product_price):
         # -- Attributes --
-        self.__product_name = str(product_name)
-        self.__product_price = float(product_price)
+        self.__product_name = product_name
+        self.__product_price = product_price
 
     # -- Properties --
     # product_name
@@ -42,19 +43,19 @@ class Product:
         if not str(value).isnumeric():
             self.__product_name = value
         else:
-            raise Exception("Product name cannot be numbers")
+            raise Exception("Product name must contain a letter.")
 
     # product_price
     @property
     def product_price(self):  # getter
-        return float(self.__product_price)  # Numeric characters
+        return float(self.__product_price)
 
     @product_price.setter
     def product_price(self, value):  # setter
-        if value >= 0:
-            self.__product_price = value
+        if not str(value).isnumeric() or float(value) < 0:
+            raise Exception("Price must be a number and cannot be negative.")
         else:
-            raise Exception("Price cannot be negative")
+            self.__product_price = value
 
     # -- Methods --
     # TODO: Add Code to the Product class
@@ -114,7 +115,8 @@ class FileProcessor:
                 file.write(str(item.product_name) + "," +
                            str(item.product_price) + "\n")
         file.close()
-        print("\n\tData saved to file: '" + file_name + "'")
+        print("\tData saved to file: '" + file_name + "'")
+        input("\nPress ENTER key to quit the program.")
         return list_of_rows
 
 # Processing  ------------------------------------------------------------- #
@@ -142,37 +144,48 @@ class IO:
 
         :return: nothing
         """
-        print("""
-    Menu of options
-    1 - Show current list of products
-    2 - Add product
-    3 - Save and exit
-        """)
+        print("\n\t" + "="*9 + " Menu of options " + "="*9 +
+              "\n\t1 - Show current list of products"
+              "\n\t2 - Add product"
+              "\n\t3 - Save and exit" +
+              "\n\t" + "="*35)
 
     # TODO: Add code to get user's choice
     @staticmethod
     def input_menu_choice():
-        choice = str(input("Select an option from the menu "
+        choice = str(input("\nSelect an option from the menu "
                            "(1-3): ")).strip()
         return choice
 
     # TODO: Add code to show the current data from the file to user
     @staticmethod
     def show_current_data(list_of_products):
-        print("\t======= List of Products =======")
+        print("\t-------- List of Products --------")
         for item in list_of_products:
             print("\t" + str(item.product_name) + "\t $" +
                   '{0:.2f}'.format(item.product_price))
-        print("\t" + "="*len("======= List of Products ======="))
+        print("\t" + "-"*35)
 
     # TODO: Add code to get product data from user
     @staticmethod
     def add_new_product():
-        n = input("Enter product NAME: \t")
-        p = input("\nEnter product PRICE: \t")
-        # print()
-        item = Product(product_name=n,
-                       product_price=p)
+        item = Product('', 0)  # instantiates 'null' item object
+        while True:
+            name = input("Enter product NAME: \t")
+            try:
+                item.product_name = name
+                break
+            except Exception as e:
+                print("\n\t" + errorCode + str(e) + "\n")
+                continue
+
+        while True:
+            price = input("\nEnter product PRICE: \t")
+            try:
+                item.product_price = price
+                break
+            except Exception as e:
+                print("\n\t" + errorCode + str(e))
         return item
 
 # Presentation (Input/Output)  -------------------------------------------- #
@@ -180,37 +193,45 @@ class IO:
 
 # Main Body of Script  ---------------------------------------------------- #
 # Load data from file into a list of product objects when script starts
-lstOfProductObjects = FileProcessor.read_data_from_file(strFileName,
-                                                        lstOfProductObjects)
+try:
+    file = open(strFileName)
+except FileNotFoundError as e:
+    print("\n\t" + errorCode + e.__str__())
+except Exception as e:
+    print(e)
+else:
+    lstOfProductObjects = FileProcessor.read_data_from_file(strFileName,
+                                                            lstOfProductObjects)
+    while True:
+        # Show user a menu of options
+        IO.output_menu_tasks()
 
-while True:
-    # Show user a menu of options
-    IO.output_menu_tasks()
+        # Get user's menu option choice
+        choice_str = IO.input_menu_choice()
 
-    # Get user's menu option choice
-    choice_str = IO.input_menu_choice()
+        # Show user current data in the list of product objects
+        if choice_str.strip() == '1':  # show current data
+            print()
+            print("\tDisplaying current list of products...")
+            print()
+            IO.show_current_data(lstOfProductObjects)
+            continue
 
-    # Show user current data in the list of product objects
-    if choice_str.strip() == '1':  # show current data
-        print()
-        print("\tDisplaying current list of products...")
-        print()
-        IO.show_current_data(lstOfProductObjects)
-        continue
+        # Let user add data to the list of product objects
+        elif choice_str.strip() == '2':  # add product
+            print()
+            print("\tAdd product information...")
+            print()
+            lstOfProductObjects.append(IO.add_new_product())
+            continue
 
-    # Let user add data to the list of product objects
-    elif choice_str.strip() == '2':  # add product
-        print()
-        print("\tAdd new product information...")
-        print()
-        lstOfProductObjects.append(IO.add_new_product())
-        continue
-
-        # let user save current data to file and exit program
-    elif choice_str.strip() == '3':
-        # ask user to save and exit
-        print("3")
-        lstOfProductObjects = \
-            FileProcessor.save_data_to_file(strFileName,
-                                            lstOfProductObjects)
-        break
+            # let user save current data to file and exit program
+        elif choice_str.strip() == '3':
+            # ask user to save and exit
+            print()
+            print("\tSaving data to file...")
+            print()
+            lstOfProductObjects = \
+                FileProcessor.save_data_to_file(strFileName,
+                                                lstOfProductObjects)
+            break
