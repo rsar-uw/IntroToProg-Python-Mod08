@@ -12,7 +12,7 @@
 # Data -------------------------------------------------------------------- #
 strFileName = "products.txt"
 lstOfProductObjects = []
-errorCode = "Error. Error. My robot balls: "
+errorCode = "Error. Error. : "
 
 class Product:
     """Stores data about a product:
