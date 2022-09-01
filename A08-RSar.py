@@ -25,6 +25,7 @@ class Product:
         2022/01/01, RRoot, Created Class
         2022/08/28, RSar, Modified code to complete assignment 8
     """
+    # TODO: Add Code to the Product class
     # -- Fields --
     # -- Constructor --
     def __init__(self, product_name, product_price):
@@ -58,13 +59,11 @@ class Product:
             raise Exception("Price must be a number and cannot be negative.")
 
     # -- Methods --
-    # TODO: Add Code to the Product class
     def to_string(self):
         return self.__str__()
 
     def __str__(self):
-        return self.product_name + "," + str(self.product_price)
-
+        return self.product_name + "\t $" + '{0:.2f}'.format(self.product_price)
 
 # Data -------------------------------------------------------------------- #
 
@@ -89,6 +88,7 @@ class FileProcessor:
     # -- Properties --
     # -- Methods --
     # TODO: Add Code to process data from a file
+
     @staticmethod
     def read_data_from_file(file_name, list_of_rows):
         with open(file_name, "r") as file:
@@ -108,6 +108,7 @@ class FileProcessor:
         return list_of_rows
 
     # TODO: Add Code to process data to a file
+
     @staticmethod
     def save_data_to_file(file_name, list_of_rows):
         with open(file_name, "w") as file:
@@ -137,10 +138,6 @@ class IO:
     # TODO: Add code to show menu to user
     @staticmethod
     def output_menu_tasks():
-        """ Display a menu of choice to the user
-
-        :return: nothing
-        """
         print("\n\t" + "="*9 + " Menu of options " + "="*9 +
               "\n\t1 - Show current list of products"
               "\n\t2 - Add product"
@@ -159,8 +156,7 @@ class IO:
     def show_current_data(list_of_products):
         print("\t-------- List of Products --------")
         for item in list_of_products:
-            print("\t" + str(item.product_name) + "\t\t $" +
-                  '{0:.2f}'.format(item.product_price))
+            print("\t" + str(item))
         print("\t" + "-"*35)
 
     # TODO: Add code to get product data from user
@@ -184,8 +180,7 @@ class IO:
             except Exception as e:
                 print("\n\t" + errorCode + str(e))
         print()
-        print("\tNew product added: \t" + str(item.product_name) + "\t $" +
-              '{0:.2f}'.format(item.product_price))
+        print("\tNew product added: \t" + str(item))
         return item
 
 # Presentation (Input/Output)  -------------------------------------------- #
